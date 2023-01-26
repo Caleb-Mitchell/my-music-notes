@@ -2,6 +2,7 @@
 # TODO: make other links work
 # TODO: Add listening page, spotify api?
 # TODO: aother scott ideas?
+# TODO: harden link to postgres?
 
 require "bcrypt"
 require "pg"
