@@ -6,6 +6,11 @@ gem "erubis"
 gem "sinatra", "~>1.4.7"
 gem "sinatra-contrib"
 
+gem "pg"
+
+gem "bcrypt"
+gem "securerandom"
+
 group :production do
   gem "puma"
 end
