@@ -4,7 +4,7 @@
 # TODO: other scott ideas?
 # TODO: harden link to postgres?
 # TODO: escape all input
-# TODO: REdo table, make more semantic throughout
+# TODO: REdo table, make more semantic throughout, flexbox?
 # TODO: add validation like in todos
 # TODO: add tests?
 # TODO: Update details on resume
