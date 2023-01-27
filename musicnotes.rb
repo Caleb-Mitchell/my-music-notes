@@ -1,8 +1,20 @@
 # TODO: add register functionality
 # TODO: make other links work
 # TODO: Add listening page, spotify api?
-# TODO: aother scott ideas?
+# TODO: other scott ideas?
 # TODO: harden link to postgres?
+# TODO: escape all input
+# TODO: REdo table, make more semantic throughout
+# TODO: add validation like in todos
+# TODO: add tests?
+# TODO: Update details on resume
+# TODO: Update README and description for Github
+# TODO: Change silly navbar collapse stuff
+
+# resume stuff
+# TODO: add more specific time frames for CiP and CS50 to resume
+# TODO: add cip hangman project to resume
+
 
 require "bcrypt"
 require "pg"
