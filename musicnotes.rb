@@ -1,8 +1,7 @@
 # TODO: add register functionality
 # TODO: make other links work
-# TODO: Add listening page, spotify api?
-# TODO: other scott ideas?
-# TODO: harden link to postgres?
+# TODO: Add listening page
+# TODO: put link to database in environment variable
 # TODO: escape all input
 # TODO: REdo table, make more semantic throughout, flexbox?
 # TODO: add validation like in todos
