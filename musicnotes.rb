@@ -12,7 +12,6 @@
 # TODO: add more specific time frames for CiP and CS50 to resume
 # TODO: add cip hangman project to resume
 
-
 require "bcrypt"
 require "pg"
 require "sinatra"
@@ -23,8 +22,8 @@ DAYS_IN_WEEK = 7
 DAYS = %w(Sunday Monday Tuesday Wednesday Thursday Friday Saturday)
 SECRET = SecureRandom.hex(32)
 
-CONN = PG.connect( dbname: 'musicnotes' ) if development?
-CONN = PG.connect(ENV['RAILWAY_DATABASE_URL']) if production?
+CONN = PG.connect(dbname: 'musicnotes') if development?
+CONN = PG.connect(ENV.fetch['RAILWAY_DATABASE_URL']) if production?
 
 configure do
   enable :sessions
@@ -44,7 +43,7 @@ end
 
 def load_user_credentials
   credentials = []
-  CONN.exec( "SELECT * FROM users" ) do |result|
+  CONN.exec("SELECT * FROM users") do |result|
     result.each do |row|
       credentials << row
     end
@@ -54,7 +53,7 @@ end
 
 def find_student_id(username)
   student_id = nil
-  CONN.exec ( "SELECT id FROM users WHERE name = '#{username}'" ) do |result|
+  CONN.exec("SELECT id FROM users WHERE name = '#{username}'") do |result|
     result.each { |row| student_id = row["id"] }
   end
   student_id
@@ -64,7 +63,8 @@ def load_user_checkboxes(username)
   student_id = find_student_id(username)
 
   checkboxes = []
-  CONN.exec ( "SELECT day, checked FROM checkboxes WHERE user_id = #{student_id}" ) do |result|
+  query = "SELECT day, checked FROM checkboxes WHERE user_id = #{student_id}"
+  CONN.exec(query) do |result|
     result.each { |row| checkboxes << row }
   end
   session[:checkboxes] = checkboxes
@@ -84,7 +84,9 @@ end
 
 def full_week?(student_id)
   count = nil
-  CONN.exec("SELECT COUNT(id) FROM checkboxes WHERE checked = true AND user_id = #{student_id}") do |result|
+  query = "SELECT COUNT(id) FROM checkboxes WHERE checked = true
+           AND user_id = #{student_id}"
+  CONN.exec(query) do |result|
     result.each { |row| count = row["count"] }
   end
   count.to_i == DAYS_IN_WEEK
@@ -142,7 +144,7 @@ post '/users/signin' do
 
   if valid_credentials?(username, params[:password])
     session[:username] = username
-    session[:success] = "Welcome!"
+    session[:success] = "Welcome #{username}!"
 
     # checkboxes is an array, with each checkbox represented by a hash
     # with keys "day" and "checked"
@@ -171,11 +173,10 @@ post '/reset' do
   student_id = find_student_id(session[:username])
 
   # update check values in checkboxes database
-  # TODO: clean this up
   @days.each do |day|
-    name = "#{day.downcase}_check"
-      CONN.exec ( "UPDATE checkboxes SET checked = false WHERE day = '#{day.downcase}'
-                 AND user_id = #{student_id.to_i}")
+    CONN.exec("UPDATE checkboxes SET checked = false
+               WHERE day = '#{day.downcase}'
+               AND user_id = #{student_id.to_i}")
   end
 
   redirect '/'
@@ -191,7 +192,8 @@ post '/users/register' do
   password = BCrypt::Password.create(params[:password])
 
   # add row to users table
-  CONN.exec ( "INSERT INTO users (name, password) VALUES ('#{username}', '#{password}')")
+  CONN.exec("INSERT INTO users (name, password)
+             VALUES ('#{username}', '#{password}')")
 
   # get user_id from users for new user
   user_id = find_student_id(username)
@@ -199,7 +201,8 @@ post '/users/register' do
   # add rows to checkboxes table
   days = DAYS
   days.each do |day|
-    CONN.exec ( "INSERT INTO checkboxes (day, user_id) VALUES ('#{day.downcase}', #{user_id})")
+    CONN.exec("INSERT INTO checkboxes (day, user_id)
+               VALUES ('#{day.downcase}', #{user_id})")
   end
 
   # sign in to new user
