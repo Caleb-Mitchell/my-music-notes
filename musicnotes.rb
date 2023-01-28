@@ -25,8 +25,8 @@ DAYS = %w(Sunday Monday Tuesday Wednesday Thursday Friday Saturday)
 
 SECRET = SecureRandom.hex(32)
 
-CONN = PG.connect(ENV['RAILWAY_DATABASE_URL'])
-# CONN = PG.connect( dbname: 'musicnotes' )
+CONN = PG.connect( dbname: 'musicnotes' ) if development?
+CONN = PG.connect(ENV['RAILWAY_DATABASE_URL']) if production?
 
 configure do
   enable :sessions
