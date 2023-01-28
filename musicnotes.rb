@@ -8,6 +8,7 @@
 # TODO: Update details on resume
 # TODO: Update README and description for Github
 # TODO: Change silly navbar collapse stuff
+# TODO: get gitignore going before making public on github?
 
 # resume stuff
 # TODO: add more specific time frames for CiP and CS50 to resume
