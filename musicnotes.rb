@@ -8,7 +8,6 @@
 # TODO: Update details on resume
 # TODO: Update README and description for Github
 # TODO: Change silly navbar collapse stuff
-# TODO: get gitignore going before making public on github?
 
 # resume stuff
 # TODO: add more specific time frames for CiP and CS50 to resume
@@ -26,7 +25,7 @@ DAYS = %w(Sunday Monday Tuesday Wednesday Thursday Friday Saturday)
 
 SECRET = SecureRandom.hex(32)
 
-CONN = ENV['DATABASE_URL']
+CONN = PG.connect(ENV['DATABASE_URL'])
 # CONN = PG.connect( dbname: 'musicnotes' )
 
 configure do
