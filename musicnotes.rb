@@ -94,7 +94,9 @@ end
 
 # Main practice log page
 get '/' do
-  # require_signed_in_user
+  redirect '/users/signin' unless user_signed_in?
+
+  require_signed_in_user
 
   @title = "Practice Log"
   @days = DAYS
