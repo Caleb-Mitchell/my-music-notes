@@ -1,4 +1,3 @@
-# TODO: add register functionality
 # TODO: make other links work
 # TODO: Add listening page
 # TODO: put link to database in environment variable
@@ -22,9 +21,12 @@ require "sinatra/reloader" if development?
 require "tilt/erubis"
 
 DAYS_IN_WEEK = 7
+DAYS = %w(Sunday Monday Tuesday Wednesday Thursday Friday Saturday)
+
 SECRET = SecureRandom.hex(32)
-# CONN = PG.connect("postgresql://postgres:LylWBbN66EEGjszz2GbB@containers-us-west-108.railway.app:6232/railway")
-CONN = PG.connect( dbname: 'musicnotes' )
+
+CONN = ENV['DATABASE_URL']
+# CONN = PG.connect( dbname: 'musicnotes' )
 
 configure do
   enable :sessions
@@ -44,7 +46,7 @@ end
 
 def load_user_credentials
   credentials = []
-  CONN.exec( "SELECT * FROM students" ) do |result|
+  CONN.exec( "SELECT * FROM users" ) do |result|
     result.each do |row|
       credentials << row
     end
@@ -54,7 +56,7 @@ end
 
 def find_student_id(username)
   student_id = nil
-  CONN.exec ( "SELECT id FROM students WHERE name = '#{username}'" ) do |result|
+  CONN.exec ( "SELECT id FROM users WHERE name = '#{username}'" ) do |result|
     result.each { |row| student_id = row["id"] }
   end
   student_id
@@ -64,7 +66,7 @@ def load_user_checkboxes(username)
   student_id = find_student_id(username)
 
   checkboxes = []
-  CONN.exec ( "SELECT day, checked FROM checkboxes WHERE student_id = #{student_id}" ) do |result|
+  CONN.exec ( "SELECT day, checked FROM checkboxes WHERE user_id = #{student_id}" ) do |result|
     result.each { |row| checkboxes << row }
   end
   session[:checkboxes] = checkboxes
@@ -95,10 +97,9 @@ get '/' do
   require_signed_in_user
 
   @title = "Practice Log"
-  @days = %w(Sunday Monday Tuesday Wednesday Thursday Friday Saturday)
+  @days = DAYS
 
   load_user_checkboxes(session[:username])
-  p session[:checkboxes]
   @day_total = session[:checkboxes].count { |day| day["checked"] == "t" }
 
   erb :practice
@@ -108,7 +109,7 @@ end
 post '/' do
   require_signed_in_user
 
-  @days = %w(Sunday Monday Tuesday Wednesday Thursday Friday Saturday)
+  @days = DAYS
   student_id = find_student_id(session[:username])
 
   # update check values in checkboxes database
@@ -117,10 +118,10 @@ post '/' do
     name = "#{day.downcase}_check"
     if params[name] == 'checked'
       CONN.exec ( "UPDATE checkboxes SET checked = true WHERE day = '#{day.downcase}'
-                 AND student_id = #{student_id.to_i}")
+                 AND user_id = #{student_id.to_i}")
     else
       CONN.exec ( "UPDATE checkboxes SET checked = false WHERE day = '#{day.downcase}'
-                 AND student_id = #{student_id.to_i}")
+                 AND user_id = #{student_id.to_i}")
     end
   end
 
@@ -143,7 +144,6 @@ post '/users/signin' do
     session[:username] = username
     session[:success] = "Welcome!"
 
-    # load the checkboxes for the corresponding user
     # checkboxes is an array, with each checkbox represented by a hash
     # with keys "day" and "checked"
     load_user_checkboxes(username)
@@ -167,7 +167,7 @@ end
 post '/reset' do
   require_signed_in_user
 
-  @days = %w(Sunday Monday Tuesday Wednesday Thursday Friday Saturday)
+  @days = DAYS
   student_id = find_student_id(session[:username])
 
   # update check values in checkboxes database
@@ -175,15 +175,39 @@ post '/reset' do
   @days.each do |day|
     name = "#{day.downcase}_check"
       CONN.exec ( "UPDATE checkboxes SET checked = false WHERE day = '#{day.downcase}'
-                 AND student_id = #{student_id.to_i}")
+                 AND user_id = #{student_id.to_i}")
   end
 
   # flash message if checkbox list is full of 1s
   session[:success] = "Great job practicing this week!" if full_week?
 
   redirect '/'
-
 end
 
 # Allow user to register
-# need to add row to both users, and to checkboxes table (with default false values)
+get '/users/register' do
+  erb :register
+end
+
+post '/users/register' do
+  username = params[:username]
+  password = BCrypt::Password.create(params[:password])
+
+  # add row to users table
+  CONN.exec ( "INSERT INTO users (name, password) VALUES ('#{username}', '#{password}')")
+
+  # get user_id from users for new user
+  user_id = find_student_id(username)
+
+  # add rows to checkboxes table
+  days = DAYS
+  days.each do |day|
+    CONN.exec ( "INSERT INTO checkboxes (day, user_id) VALUES ('#{day.downcase}', #{user_id})")
+  end
+
+  # sign in to new user
+  session[:username] = username
+  session[:success] = "User #{username} created!"
+
+  redirect '/'
+end
