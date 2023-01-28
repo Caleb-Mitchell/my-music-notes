@@ -1,6 +1,5 @@
 # TODO: make other links work
 # TODO: Add listening page
-# TODO: put link to database in environment variable
 # TODO: escape all input
 # TODO: REdo table, make more semantic throughout, flexbox?
 # TODO: add validation like in todos
@@ -22,7 +21,6 @@ require "tilt/erubis"
 
 DAYS_IN_WEEK = 7
 DAYS = %w(Sunday Monday Tuesday Wednesday Thursday Friday Saturday)
-
 SECRET = SecureRandom.hex(32)
 
 CONN = PG.connect( dbname: 'musicnotes' ) if development?
@@ -84,10 +82,9 @@ def valid_credentials?(username, password)
   false
 end
 
-def full_week?
-  # TODO: Also need to check for ID or this breaks
+def full_week?(student_id)
   count = nil
-  CONN.exec("SELECT COUNT(id) FROM checkboxes WHERE checked = true") do |result|
+  CONN.exec("SELECT COUNT(id) FROM checkboxes WHERE checked = true AND user_id = #{student_id}") do |result|
     result.each { |row| count = row["count"] }
   end
   count.to_i == DAYS_IN_WEEK
@@ -129,7 +126,7 @@ post '/' do
   end
 
   # flash message if checkbox list is full of 1s
-  session[:success] = "Great job practicing this week!" if full_week?
+  session[:success] = "Great job practicing this week!" if full_week?(student_id)
 
   redirect '/'
 end
