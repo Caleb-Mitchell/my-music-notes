@@ -178,9 +178,6 @@ post '/reset' do
                  AND user_id = #{student_id.to_i}")
   end
 
-  # flash message if checkbox list is full of 1s
-  session[:success] = "Great job practicing this week!" if full_week?
-
   redirect '/'
 end
 
