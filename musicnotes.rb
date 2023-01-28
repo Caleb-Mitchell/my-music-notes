@@ -94,7 +94,7 @@ end
 
 # Main practice log page
 get '/' do
-  require_signed_in_user
+  # require_signed_in_user
 
   @title = "Practice Log"
   @days = DAYS
