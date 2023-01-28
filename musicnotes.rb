@@ -85,6 +85,7 @@ def valid_credentials?(username, password)
 end
 
 def full_week?
+  # TODO: Also need to check for ID or this breaks
   count = nil
   CONN.exec("SELECT COUNT(id) FROM checkboxes WHERE checked = true") do |result|
     result.each { |row| count = row["count"] }
