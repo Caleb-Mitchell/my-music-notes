@@ -25,7 +25,7 @@ DAYS = %w(Sunday Monday Tuesday Wednesday Thursday Friday Saturday)
 
 SECRET = SecureRandom.hex(32)
 
-CONN = PG.connect(ENV['DATABASE_URL'])
+CONN = PG.connect(ENV['RAILWAY_DATABASE_URL'])
 # CONN = PG.connect( dbname: 'musicnotes' )
 
 configure do
