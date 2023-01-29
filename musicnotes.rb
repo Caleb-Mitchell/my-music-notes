@@ -23,7 +23,7 @@ DAYS_IN_WEEK = DAYS.size
 SECRET = SecureRandom.hex(32)
 
 CONN = PG.connect(dbname: 'musicnotes') if development?
-CONN = PG.connect(ENV['RAILWAY_DATABASE_URL']) if production?
+CONN = PG.connect(ENV.fetch('RAILWAY_DATABASE_URL', nil)) if production?
 
 configure do
   enable :sessions
@@ -121,9 +121,10 @@ def add_user_checkboxes(username)
 end
 
 def create_new_user(username, password)
+  username = username.downcase
   hashed_password = BCrypt::Password.create(password)
   CONN.exec("INSERT INTO users (name, password)
-             VALUES ('#{username.downcase}', '#{hashed_password}')")
+             VALUES ('#{username}', '#{hashed_password}')")
   add_user_checkboxes(username)
   sign_in_user(username)
 end
