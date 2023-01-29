@@ -2,8 +2,7 @@
 <html lang="en">
 
 <head>
-  <title>My Music Notes: <%= @title %>
-  </title>
+  <title>My Music Notes: <%= @title %></title>
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -53,15 +52,13 @@
     <a class="navbar-brand" href="/">My Music Notes</a>
     <button aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler"
       data-target="#navbar" data-toggle="collapse" type="button">
-      <span class="navbar-toggler-icon"></span>
+      <span class="navbar-toggler-icon"><img src="/images/square-caret-down-regular.svg" alt="Dropdown toggle icon for small screens"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbar">
       <% if session[:username] %>
         <ul class="navbar-nav mx-5">
           <li class="nav-item"><a class="nav-link" href="/">Practice Log</a></li>
-          <li class="nav-item"><a class="nav-link"> | </a></li>
           <li class="nav-item"><a class="nav-link" href="/listen">Listening Recommendations</a></li>
-          <li class="nav-item"><a class="nav-link"> | </a></li>
           <li class="nav-item"><a class="nav-link" href="https://www.metronomeonline.com/"
               target="_blank">MetronomeOnline.com</a></li>
         </ul>
@@ -88,6 +85,5 @@
   <footer class="small text-center text-muted">
     Website designed by Caleb Mitchell - calebj.mitchell@gmail.com
   </footer>
-
 </body>
 </html>
