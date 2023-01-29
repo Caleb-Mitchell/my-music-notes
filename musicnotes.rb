@@ -1,9 +1,9 @@
-# TODO: REdo table, make more semantic throughout, flexbox?
-# TODO: add validation like in todos
+# TODO: provide helpful status codes on errors or redirection
 # TODO: add tests?
 # TODO: Update details on resume
 # TODO: Update README and description for Github
-# TODO: set up apology page
+# TODO: set up apology page?
+# TODO: title instance var for every page GET?
 
 # resume stuff
 # TODO: add more specific time frames for CiP and CS50 to resume
@@ -29,6 +29,12 @@ configure do
   set :erb, escape_html: true
 end
 
+helpers do
+  def day_checked?(checkboxes, day)
+    checkboxes.find { |hash| hash["day"] == day.downcase }["checked"] == "t"
+  end
+end
+
 def user_signed_in?
   session.key?(:username)
 end
@@ -36,7 +42,7 @@ end
 def require_signed_in_user
   return if user_signed_in?
 
-  session[:error] = "You must be signed in to do that"
+  session[:error] = "You must be signed in to do that."
   redirect '/users/signin'
 end
 
@@ -91,6 +97,35 @@ def full_week?(student_id)
   count.to_i == DAYS_IN_WEEK
 end
 
+def username_taken?(name)
+  query = "SELECT COUNT(id) FROM users WHERE name = '#{name.downcase}'"
+  CONN.exec(query) do |result|
+    return result.values.flatten[0] == "1"
+  end
+end
+
+def sign_in_user(username)
+  session[:username] = username
+  session[:success] = "User #{username.capitalize} created!"
+end
+
+def add_user_checkboxes(username)
+  user_id = find_student_id(username)
+  days = DAYS
+  days.each do |day|
+    CONN.exec("INSERT INTO checkboxes (day, user_id)
+               VALUES ('#{day.downcase}', #{user_id})")
+  end
+end
+
+def create_new_user(username, password)
+  hashed_password = BCrypt::Password.create(password)
+  CONN.exec("INSERT INTO users (name, password)
+             VALUES ('#{username.downcase}', '#{hashed_password}')")
+  add_user_checkboxes(username)
+  sign_in_user(username)
+end
+
 # Main practice log page
 get '/' do
   redirect '/users/signin' unless user_signed_in?
@@ -141,11 +176,11 @@ get '/users/signin' do
 end
 
 post '/users/signin' do
-  username = params[:username]
+  username = params[:username].downcase
 
   if valid_credentials?(username, params[:password])
     session[:username] = username
-    session[:success] = "Welcome #{username}!"
+    session[:success] = "Welcome #{username.capitalize}!"
 
     # checkboxes is an array, with each checkbox represented by a hash
     # with keys "day" and "checked"
@@ -190,27 +225,23 @@ end
 
 post '/users/register' do
   username = params[:username]
-  password = BCrypt::Password.create(params[:password])
 
-  # add row to users table
-  CONN.exec("INSERT INTO users (name, password)
-             VALUES ('#{username}', '#{password}')")
-
-  # get user_id from users for new user
-  user_id = find_student_id(username)
-
-  # add rows to checkboxes table
-  days = DAYS
-  days.each do |day|
-    CONN.exec("INSERT INTO checkboxes (day, user_id)
-               VALUES ('#{day.downcase}', #{user_id})")
+  if username_taken?(username)
+    session[:error] = "Sorry, that username is already taken."
+    status 422
+    erb :register
+  elsif username.empty?
+    session[:error] = "Please provide a username."
+    status 422
+    erb :register
+  elsif params[:password].empty?
+    session[:error] = "Please provide a password."
+    status 422
+    erb :register
+  else
+    create_new_user(username, params[:password])
+    redirect '/'
   end
-
-  # sign in to new user
-  session[:username] = username
-  session[:success] = "User #{username} created!"
-
-  redirect '/'
 end
 
 # Show listening recomendations
