@@ -16,37 +16,34 @@
   </div>
 </div>
 
-  <form action="/" method="post" id="check_boxes">
-    <table class="table table-bordered">
-      <tbody>
-        <% @days.each do |day| %>
-        <tr>
-          <td class="table-date-text"><%= day %></td>
-          <td>
-            <div class="form-check">
-              <label class="form-check-label">
-                <% if session[:checkboxes].find { |hash| hash["day"] == day.downcase }["checked"] == "t" %>
-                  <input class="form-check-input" style="margin-top: 30px" type="checkbox"
-                         value="checked" name="<%= "#{day.downcase}_check" %>"
-                         onchange="document.getElementById('check_boxes').submit()" checked>
-                <% elsif session[:checkboxes].find { |hash| hash["day"] == day.downcase }["checked"] == "f" %>
-                  <input class="form-check-input" style="margin-top: 30px" type="checkbox"
-                         value="checked" name="<%= "#{day.downcase}_check" %>"
-                         onchange="document.getElementById('check_boxes').submit()">
-                <% end %>
-                <span class="form-check-sign">
-                  <span class="check"></span>
-                </span>
-              </label>
-            </div>
-          </td>
-        </tr>
-        <% end %>
-      </tbody>
-    </table>
-  </form>
-</div>
+<form action="/" method="post" id="check_boxes">
+  <table class="table table-bordered">
+      <% @days.each do |day| %>
+      <tr>
+        <td class="table-date-text"><%= day %></td>
+        <td>
+          <div class="form-check">
+            <label class="form-check-label">
+              <% if day_checked?(session[:checkboxes], day) %>
+                <input class="form-check-input" style="margin-top: 30px" type="checkbox"
+                       value="checked" name="<%= "#{day.downcase}_check" %>"
+                       onchange="document.getElementById('check_boxes').submit()" checked>
+              <% else %>
+                <input class="form-check-input" style="margin-top: 30px" type="checkbox"
+                       value="checked" name="<%= "#{day.downcase}_check" %>"
+                       onchange="document.getElementById('check_boxes').submit()">
+              <% end %>
+              <span class="form-check-sign">
+                <span class="check"></span>
+              </span>
+            </label>
+          </div>
+        </td>
+      </tr>
+      <% end %>
+  </table>
+</form>
 
 <form action="/reset" method="post">
-    <input type="submit" value="Reset">
+    <input type="submit" value="Reset All">
 </form>
