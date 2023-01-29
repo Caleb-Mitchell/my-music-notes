@@ -1,4 +1,3 @@
-# TODO: escape all input
 # TODO: REdo table, make more semantic throughout, flexbox?
 # TODO: add validation like in todos
 # TODO: add tests?
@@ -27,6 +26,7 @@ CONN = PG.connect(ENV.fetch['RAILWAY_DATABASE_URL']) if production?
 configure do
   enable :sessions
   set :session_secret, SECRET
+  set :erb, escape_html: true
 end
 
 def user_signed_in?
