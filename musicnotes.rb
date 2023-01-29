@@ -7,6 +7,7 @@
 # TODO: Update details on resume
 # TODO: Update README and description for Github
 # TODO: Change silly navbar collapse stuff
+# TODO: set up apology page
 
 # resume stuff
 # TODO: add more specific time frames for CiP and CS50 to resume
@@ -210,4 +211,10 @@ post '/users/register' do
   session[:success] = "User #{username} created!"
 
   redirect '/'
+end
+
+# Show listening recomendations
+get '/listen' do
+  erb :listen
+
 end
