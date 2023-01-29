@@ -17,6 +17,13 @@ nav .navbar-brand .green {
   color: #2e944b;
 }
 
+.navbar-toggler-icon
+{
+  height: 2.5rem;
+  width: 2.5rem;
+  border-style: none;
+}
+
 main .form-control {
   /* center form controls */
   display: inline-block;
@@ -45,6 +52,7 @@ main img {
 .plain-button {
   border: none;
   background: none;
+  margin-right: .5rem;
 }
 
 .figure-caption {
