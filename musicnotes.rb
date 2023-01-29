@@ -21,7 +21,7 @@ DAYS_IN_WEEK = DAYS.size
 SECRET = SecureRandom.hex(32)
 
 CONN = PG.connect(dbname: 'musicnotes') if development?
-CONN = PG.connect(ENV.fetch['RAILWAY_DATABASE_URL']) if production?
+CONN = PG.connect(ENV['RAILWAY_DATABASE_URL']) if production?
 
 configure do
   enable :sessions
