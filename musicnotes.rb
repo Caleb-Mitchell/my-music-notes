@@ -9,6 +9,8 @@
 # TODO: add more specific time frames for CiP and CS50 to resume
 # TODO: add cip hangman project to resume
 
+# TODO: Add gem versions to GEMFILE
+
 require "bcrypt"
 require "pg"
 require "sinatra"
