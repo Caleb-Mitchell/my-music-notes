@@ -1,12 +1,9 @@
-# TODO: make other links work
-# TODO: Add listening page
 # TODO: escape all input
 # TODO: REdo table, make more semantic throughout, flexbox?
 # TODO: add validation like in todos
 # TODO: add tests?
 # TODO: Update details on resume
 # TODO: Update README and description for Github
-# TODO: Change silly navbar collapse stuff
 # TODO: set up apology page
 
 # resume stuff
@@ -19,8 +16,9 @@ require "sinatra"
 require "sinatra/reloader" if development?
 require "tilt/erubis"
 
-DAYS_IN_WEEK = 7
 DAYS = %w(Sunday Monday Tuesday Wednesday Thursday Friday Saturday)
+DAYS_IN_WEEK = DAYS.size
+
 SECRET = SecureRandom.hex(32)
 
 CONN = PG.connect(dbname: 'musicnotes') if development?
@@ -116,20 +114,22 @@ post '/' do
   student_id = find_student_id(session[:username])
 
   # update check values in checkboxes database
-  # TODO: clean this up
   @days.each do |day|
     name = "#{day.downcase}_check"
     if params[name] == 'checked'
-      CONN.exec ( "UPDATE checkboxes SET checked = true WHERE day = '#{day.downcase}'
+      CONN.exec("UPDATE checkboxes SET checked = true
+                 WHERE day = '#{day.downcase}'
                  AND user_id = #{student_id.to_i}")
     else
-      CONN.exec ( "UPDATE checkboxes SET checked = false WHERE day = '#{day.downcase}'
+      CONN.exec("UPDATE checkboxes SET checked = false
+                 WHERE day = '#{day.downcase}'
                  AND user_id = #{student_id.to_i}")
     end
   end
 
-  # flash message if checkbox list is full of 1s
-  session[:success] = "Great job practicing this week!" if full_week?(student_id)
+  if full_week?(student_id)
+    session[:success] = "Great job practicing this week!"
+  end
 
   redirect '/'
 end
@@ -216,5 +216,4 @@ end
 # Show listening recomendations
 get '/listen' do
   erb :listen
-
 end
