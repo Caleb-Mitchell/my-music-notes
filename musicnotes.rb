@@ -188,7 +188,7 @@ post '/users/signin' do
     redirect '/'
   else
     session[:error] = "Invalid credentials."
-    status 422
+    # status 422
     erb :signin
   end
 end
@@ -227,15 +227,15 @@ post '/users/register' do
 
   if username_taken?(username)
     session[:error] = "Sorry, that username is already taken."
-    status 422
+    # status 422
     erb :register
   elsif username.empty?
     session[:error] = "Please provide a username."
-    status 422
+    # status 422
     erb :register
   elsif params[:password].empty?
     session[:error] = "Please provide a password."
-    status 422
+    # status 422
     erb :register
   else
     create_new_user(username, params[:password])
