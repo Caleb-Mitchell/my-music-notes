@@ -24,6 +24,10 @@ nav .navbar-brand .green {
   border-style: none;
 }
 
+button.navbar-toggler {
+  outline: none;
+}
+
 main .form-control {
   /* center form controls */
   display: inline-block;
