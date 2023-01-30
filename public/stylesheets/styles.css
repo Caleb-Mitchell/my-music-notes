@@ -84,3 +84,11 @@ main img {
 hr.footer-hr {
   width: 25%;
 }
+
+img.footer-icon {
+  width: 1.2em;
+}
+
+footer a {
+  text-decoration: none;
+}
