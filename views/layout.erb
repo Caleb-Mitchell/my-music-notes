@@ -48,11 +48,11 @@
 </header>
 
 <body>
-  <nav class="navbar navbar-expand-lg">
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <a class="navbar-brand" href="/">My Music Notes</a>
     <button aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler"
-      data-target="#navbar" data-toggle="collapse" type="button">
-      <span class="navbar-toggler-icon"><img src="/images/square-caret-down-regular.svg" alt="Dropdown toggle icon for small screens"></span>
+      data-target="#navbar" data-toggle="collapse" type="button" data-bs-toggle="dropdown">
+      <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbar">
       <% if session[:username] %>
