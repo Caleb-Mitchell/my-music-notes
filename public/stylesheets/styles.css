@@ -63,3 +63,7 @@ main img {
 .listen-hr {
   border-style: dotted;
 }
+
+hr.footer-hr {
+  width: 25%;
+}
