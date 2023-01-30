@@ -1,3 +1,16 @@
+@media only screen and (max-width: 992px) {
+  a.responsive-link {
+    display: block;
+    margin-top: 1rem;
+  }
+}
+
+@media only screen and (min-width: 993px) {
+  a.responsive-link {
+    display: none;
+  }
+}
+
 nav .navbar-brand {
   /* size for brand */
   font-size: xx-large;
