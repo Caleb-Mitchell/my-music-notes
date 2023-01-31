@@ -99,6 +99,15 @@ def practice_every_day?(student_id)
   count.to_i == DAYS_IN_WEEK
 end
 
+def user_has_full_week?(student_id)
+  count = nil
+  query = "SELECT COUNT(id) FROM checkboxes WHERE user_id = #{student_id}"
+  CONN.exec(query) do |result|
+    result.each { |row| count = row["count"] }
+  end
+  count.to_i == DAYS_IN_WEEK
+end
+
 def username_taken?(name)
   query = "SELECT COUNT(id) FROM users WHERE name = '#{name.downcase}'"
   CONN.exec(query) do |result|
@@ -150,6 +159,10 @@ post '/' do
   @days = DAYS
   student_id = find_student_id(session[:username])
 
+  # only made request if database has data for all 7 days, for that user
+  # if not, store a flash message saying to slow down, and redisplay the page
+  # not sure if issue is upon account creation, or on update, will test on update first
+
   # update check values in checkboxes database
   @days.each do |day|
     name = "#{day.downcase}_check"
@@ -163,7 +176,7 @@ post '/' do
     session[:success] = "Great job practicing this week!"
   end
 
-  redirect '/'
+  redirect '/' if user_has_full_week?(student_id)
 end
 
 # Allow user to sign in
