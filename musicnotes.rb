@@ -99,15 +99,6 @@ def practice_every_day?(student_id)
   count.to_i == DAYS_IN_WEEK
 end
 
-def user_has_full_week?(student_id)
-  count = nil
-  query = "SELECT COUNT(id) FROM checkboxes WHERE user_id = #{student_id}"
-  CONN.exec(query) do |result|
-    result.each { |row| count = row["count"] }
-  end
-  count.to_i == DAYS_IN_WEEK
-end
-
 def username_taken?(name)
   query = "SELECT COUNT(id) FROM users WHERE name = '#{name.downcase}'"
   CONN.exec(query) do |result|
@@ -176,7 +167,7 @@ post '/' do
     session[:success] = "Great job practicing this week!"
   end
 
-  redirect '/' if user_has_full_week?(student_id)
+  redirect '/'
 end
 
 # Allow user to sign in
@@ -225,7 +216,7 @@ post '/reset' do
                AND user_id = #{student_id.to_i}")
   end
 
-  redirect '/' if user_has_full_week?(student_id)
+  redirect '/'
 end
 
 # Allow user to register
