@@ -153,15 +153,10 @@ post '/' do
   # update check values in checkboxes database
   @days.each do |day|
     name = "#{day.downcase}_check"
-    if params[name] == 'checked'
-      CONN.exec("UPDATE checkboxes SET checked = true
-                 WHERE day = '#{day.downcase}'
-                 AND user_id = #{student_id.to_i}")
-    else
-      CONN.exec("UPDATE checkboxes SET checked = false
-                 WHERE day = '#{day.downcase}'
-                 AND user_id = #{student_id.to_i}")
-    end
+    checked = (params[name] == 'checked')
+    CONN.exec("UPDATE checkboxes SET checked = #{checked}
+               WHERE day = '#{day.downcase}'
+               AND user_id = #{student_id.to_i}")
   end
 
   if full_week?(student_id)
