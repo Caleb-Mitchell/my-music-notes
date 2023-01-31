@@ -15,7 +15,6 @@ require "bcrypt"
 require "pg"
 require "sinatra"
 require "sinatra/reloader" if development?
-require "thread"
 require "tilt/erubis"
 
 DAYS = %w(Sunday Monday Tuesday Wednesday Thursday Friday Saturday)
