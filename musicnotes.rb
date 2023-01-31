@@ -15,6 +15,7 @@ require "bcrypt"
 require "pg"
 require "sinatra"
 require "sinatra/reloader" if development?
+require "thread"
 require "tilt/erubis"
 
 DAYS = %w(Sunday Monday Tuesday Wednesday Thursday Friday Saturday)
@@ -155,12 +156,17 @@ post '/' do
   # not sure if issue is upon account creation, or on update, will test on update first
 
   # update check values in checkboxes database
+
+  @db_mutex = Mutex.new
   @days.each do |day|
     name = "#{day.downcase}_check"
     checked = (params[name] == 'checked')
-    CONN.exec("UPDATE checkboxes SET checked = '#{checked}'
-               WHERE day = '#{day.downcase}'
-               AND user_id = #{student_id.to_i}")
+
+    @db_mutex.synchronize do
+      CONN.exec("UPDATE checkboxes SET checked = #{checked}
+                 WHERE day = '#{day.downcase}'
+                 AND user_id = #{student_id.to_i}")
+    end
   end
 
   if practice_every_day?(student_id)
@@ -210,10 +216,15 @@ post '/reset' do
   student_id = find_student_id(session[:username])
 
   # update check values in checkboxes database
+
+  @db_mutex = Mutex.new
+
   @days.each do |day|
-    CONN.exec("UPDATE checkboxes SET checked = false
-               WHERE day = '#{day.downcase}'
-               AND user_id = #{student_id.to_i}")
+    @db_mutex.synchronize do
+      CONN.exec("UPDATE checkboxes SET checked = false
+                 WHERE day = '#{day.downcase}'
+                 AND user_id = #{student_id.to_i}")
+    end
   end
 
   redirect '/'
