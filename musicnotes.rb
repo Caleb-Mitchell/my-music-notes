@@ -167,7 +167,7 @@ post '/' do
   @days.each do |day|
     name = "#{day.downcase}_check"
     checked = (params[name] == 'checked')
-    CONN.exec("UPDATE checkboxes SET checked = #{checked}
+    CONN.exec("UPDATE checkboxes SET checked = '#{checked}'
                WHERE day = '#{day.downcase}'
                AND user_id = #{student_id.to_i}")
   end
