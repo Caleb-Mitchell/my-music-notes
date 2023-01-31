@@ -89,7 +89,7 @@ def valid_credentials?(username, password)
   false
 end
 
-def full_week?(student_id)
+def practice_every_day?(student_id)
   count = nil
   query = "SELECT COUNT(id) FROM checkboxes WHERE checked = true
            AND user_id = #{student_id}"
@@ -159,7 +159,7 @@ post '/' do
                AND user_id = #{student_id.to_i}")
   end
 
-  if full_week?(student_id)
+  if practice_every_day?(student_id)
     session[:success] = "Great job practicing this week!"
   end
 
