@@ -26,12 +26,14 @@
             <label class="form-check-label">
               <% if day_checked?(session[:checkboxes], day) %>
                 <input class="form-check-input" style="margin-top: 30px" type="checkbox"
-                       value="checked" name="<%= "#{day.downcase}_check" %>"
-                       onchange="document.getElementById('check_boxes').submit()" checked>
+                  value="checked" name="<%= "#{day.downcase}_check" %>"
+                  id="<%= "#{day.downcase}_check" %>"
+                  onchange="disableThenSubmit()" checked>
               <% else %>
                 <input class="form-check-input" style="margin-top: 30px" type="checkbox"
-                       value="checked" name="<%= "#{day.downcase}_check" %>"
-                       onchange="document.getElementById('check_boxes').submit()">
+                  value="checked" name="<%= "#{day.downcase}_check" %>"
+                  id="<%= "#{day.downcase}_check" %>"
+                  onchange="disableThenSubmit()">
               <% end %>
               <span class="form-check-sign">
                 <span class="check"></span>
