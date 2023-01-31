@@ -71,8 +71,11 @@ def load_user_checkboxes(username)
 
   checkboxes = []
   query = "SELECT day, checked FROM checkboxes WHERE user_id = #{student_id}"
-  CONN.exec(query) do |result|
-    result.each { |row| checkboxes << row }
+  @db_mutex = Mutex.new
+  @db_mutex.synchronize do
+    CONN.exec(query) do |result|
+      result.each { |row| checkboxes << row }
+    end
   end
   session[:checkboxes] = checkboxes
 end
@@ -93,8 +96,11 @@ def practice_every_day?(student_id)
   count = nil
   query = "SELECT COUNT(id) FROM checkboxes WHERE checked = true
            AND user_id = #{student_id}"
-  CONN.exec(query) do |result|
-    result.each { |row| count = row["count"] }
+  @db_mutex = Mutex.new
+  @db_mutex.synchronize do
+    CONN.exec(query) do |result|
+      result.each { |row| count = row["count"] }
+    end
   end
   count.to_i == DAYS_IN_WEEK
 end
@@ -114,9 +120,12 @@ end
 def add_user_checkboxes(username)
   user_id = find_student_id(username)
   days = DAYS
-  days.each do |day|
-    CONN.exec("INSERT INTO checkboxes (day, user_id)
-               VALUES ('#{day.downcase}', #{user_id})")
+  @db_mutex = Mutex.new
+  @db_mutex.synchronize do
+    days.each do |day|
+      CONN.exec("INSERT INTO checkboxes (day, user_id)
+                 VALUES ('#{day.downcase}', #{user_id})")
+    end
   end
 end
 
@@ -150,26 +159,21 @@ post '/' do
   @days = DAYS
   student_id = find_student_id(session[:username])
 
-  # only made request if database has data for all 7 days, for that user
-  # if not, store a flash message saying to slow down, and redisplay the page
-  # not sure if issue is upon account creation, or on update, will test on update first
-
   # update check values in checkboxes database
-
   @db_mutex = Mutex.new
-  @days.each do |day|
-    name = "#{day.downcase}_check"
-    checked = (params[name] == 'checked')
+  @db_mutex.synchronize do
+    @days.each do |day|
+      name = "#{day.downcase}_check"
+      checked = (params[name] == 'checked')
 
-    @db_mutex.synchronize do
       CONN.exec("UPDATE checkboxes SET checked = '#{checked}'
                  WHERE day = '#{day.downcase}'
                  AND user_id = #{student_id.to_i}")
     end
-  end
 
-  if practice_every_day?(student_id)
-    session[:success] = "Great job practicing this week!"
+    if practice_every_day?(student_id)
+      session[:success] = "Great job practicing this week!"
+    end
   end
 
   redirect '/'
@@ -214,12 +218,9 @@ post '/reset' do
   @days = DAYS
   student_id = find_student_id(session[:username])
 
-  # update check values in checkboxes database
-
   @db_mutex = Mutex.new
-
-  @days.each do |day|
-    @db_mutex.synchronize do
+  @db_mutex.synchronize do
+    @days.each do |day|
       CONN.exec("UPDATE checkboxes SET checked = false
                  WHERE day = '#{day.downcase}'
                  AND user_id = #{student_id.to_i}")
