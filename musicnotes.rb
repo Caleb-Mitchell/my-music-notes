@@ -163,7 +163,7 @@ post '/' do
     checked = (params[name] == 'checked')
 
     @db_mutex.synchronize do
-      CONN.exec("UPDATE checkboxes SET checked = #{checked}
+      CONN.exec("UPDATE checkboxes SET checked = '#{checked}'
                  WHERE day = '#{day.downcase}'
                  AND user_id = #{student_id.to_i}")
     end
