@@ -225,7 +225,7 @@ post '/reset' do
                AND user_id = #{student_id.to_i}")
   end
 
-  redirect '/'
+  redirect '/' if user_has_full_week?(student_id)
 end
 
 # Allow user to register
