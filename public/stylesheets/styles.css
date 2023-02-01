@@ -100,3 +100,7 @@ footer a {
 #reset-button:disabled {
   opacity: 1;
 }
+
+div.row {
+  margin: 30px;
+}
