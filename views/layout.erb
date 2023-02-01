@@ -66,7 +66,7 @@
         </ul>
         <ul class="navbar-nav ml-auto mt-2">
           <li class="nav-item">
-            <form action="/users/signout" method="post">
+            <form action="/users/logout" method="post">
               <input class="plain-button" type="submit" value="Log Out">
             </form>
           </li>
@@ -74,7 +74,7 @@
       <% else %>
           <ul class="navbar-nav ml-auto mt-2">
             <li class="nav-item"><a class="nav-link" href="/users/register">Register</a></li>
-            <li class="nav-item"><a class="nav-link" href="/users/signin">Log In</a></li>
+            <li class="nav-item"><a class="nav-link" href="/users/login">Log In</a></li>
           </ul>
       <% end %>
     </div>
