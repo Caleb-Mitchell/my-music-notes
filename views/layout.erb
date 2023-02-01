@@ -28,23 +28,8 @@
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
     integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
     crossorigin="anonymous"></script>
-  <script>
-    function disableThenSubmit() {
-      console.log("hello scott")
-      const form = document.getElementById("check_boxes")
-      if (!form) return
-
-      const buttons = document.querySelectorAll(".form-check-input")
-      // const buttonArray = Array.from(buttons)
-
-      // console.log(buttonArray)
-      form.submit()
-      buttons.forEach(function(button) {
-        button.setAttribute("disabled", "true")
-        // button.toggleAttribute("checked")
-      })
-    }
-  </script>
+  <!-- Custom JS -->
+  <script src="/javascripts/disableThenSubmit.js"></script>
 </head>
 
 <header>
