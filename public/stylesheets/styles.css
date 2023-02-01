@@ -92,3 +92,7 @@ img.footer-icon {
 footer a {
   text-decoration: none;
 }
+
+[type="checkbox"]:disabled::before {
+  border: 2px solid;
+}
