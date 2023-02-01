@@ -169,6 +169,7 @@ end
 # Allow user to log in
 get '/users/login' do
   @title = "Log In"
+
   erb :login
 end
 
@@ -220,6 +221,7 @@ end
 # Allow user to register
 get '/users/register' do
   @title = "Register"
+
   erb :register
 end
 
@@ -246,5 +248,7 @@ end
 
 # Show listening recomendations
 get '/listen' do
+  @title = "Listening Recs"
+
   erb :listen
 end
