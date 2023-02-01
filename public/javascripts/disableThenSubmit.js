@@ -5,5 +5,5 @@ function disableThenSubmit() {
 
   const buttons = document.querySelectorAll('.form-check-input')
   form.submit()
-  buttons.forEach((button) => button.setAttributes('disabled', true))
+  buttons.forEach((button) => button.setAttribute('disabled', true))
 }
