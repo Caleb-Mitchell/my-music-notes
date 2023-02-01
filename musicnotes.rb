@@ -37,9 +37,11 @@ end
 
 def load_user_credentials
   credentials = []
-  CONN.exec("SELECT * FROM users") do |result|
-    result.each do |row|
-      credentials << row
+  CONN.transaction do |trans_conn|
+    trans_conn.exec("SELECT * FROM users") do |result|
+      result.each do |row|
+        credentials << row
+      end
     end
   end
   credentials
@@ -47,8 +49,10 @@ end
 
 def find_student_id(username)
   student_id = nil
-  CONN.exec("SELECT id FROM users WHERE name = '#{username}'") do |result|
-    result.each { |row| student_id = row["id"] }
+  CONN.transaction do |trans_conn|
+    trans_conn.exec("SELECT id FROM users WHERE name = '#{username}'") do |result|
+      result.each { |row| student_id = row["id"] }
+    end
   end
   student_id
 end
@@ -58,8 +62,10 @@ def load_user_checkboxes(username)
 
   checkboxes = []
   query = "SELECT day, checked FROM checkboxes WHERE user_id = #{student_id}"
-  CONN.exec(query) do |result|
-    result.each { |row| checkboxes << row }
+  CONN.transaction do |trans_conn|
+    trans_conn.exec(query) do |result|
+      result.each { |row| checkboxes << row }
+    end
   end
   session[:checkboxes] = checkboxes
 end
@@ -78,18 +84,22 @@ end
 
 def practice_every_day?(student_id)
   count = nil
-  query = "SELECT COUNT(id) FROM checkboxes WHERE checked = true
-           AND user_id = #{student_id}"
-  CONN.exec(query) do |result|
-    result.each { |row| count = row["count"] }
+  CONN.transaction do |trans_conn|
+    query = "SELECT COUNT(id) FROM checkboxes WHERE checked = true
+             AND user_id = #{student_id}"
+    trans_conn.exec(query) do |result|
+      result.each { |row| count = row["count"] }
+    end
   end
   count.to_i == DAYS_IN_WEEK
 end
 
 def username_taken?(name)
   query = "SELECT COUNT(id) FROM users WHERE name = '#{name.downcase}'"
-  CONN.exec(query) do |result|
-    return result.values.flatten[0] == "1"
+  CONN.transaction do |trans_conn|
+    trans_conn.exec(query) do |result|
+      return result.values.flatten[0] == "1"
+    end
   end
 end
 
@@ -101,17 +111,21 @@ end
 def add_user_checkboxes(username)
   user_id = find_student_id(username)
   days = DAYS
-  days.each do |day|
-    CONN.exec("INSERT INTO checkboxes (day, user_id)
-                 VALUES ('#{day.downcase}', #{user_id})")
+  CONN.transaction do |trans_conn|
+    days.each do |day|
+      trans_conn.exec("INSERT INTO checkboxes (day, user_id)
+                   VALUES ('#{day.downcase}', #{user_id})")
+    end
   end
 end
 
 def create_new_user(username, password)
   username = username.downcase
   hashed_password = BCrypt::Password.create(password)
-  CONN.exec("INSERT INTO users (name, password)
-             VALUES ('#{username}', '#{hashed_password}')")
+  CONN.transaction do |trans_conn|
+    trans_conn.exec("INSERT INTO users (name, password)
+               VALUES ('#{username}', '#{hashed_password}')")
+  end
   add_user_checkboxes(username)
   log_in_user(username)
 end
@@ -142,9 +156,11 @@ post '/' do
     name = "#{day.downcase}_check"
     checked = (params[name] == 'checked')
 
-    CONN.exec("UPDATE checkboxes SET checked = '#{checked}'
-                 WHERE day = '#{day.downcase}'
-                 AND user_id = #{student_id.to_i}")
+    CONN.transaction do |trans_conn|
+      trans_conn.exec("UPDATE checkboxes SET checked = '#{checked}'
+                   WHERE day = '#{day.downcase}'
+                   AND user_id = #{student_id.to_i}")
+    end
 
     if practice_every_day?(student_id)
       session[:success] = "Great job practicing this week!"
@@ -194,10 +210,12 @@ post '/reset' do
   @days = DAYS
   student_id = find_student_id(session[:username])
 
-  @days.each do |day|
-    CONN.exec("UPDATE checkboxes SET checked = false
-                 WHERE day = '#{day.downcase}'
-                 AND user_id = #{student_id.to_i}")
+  CONN.transaction do |trans_conn|
+    @days.each do |day|
+      trans_conn.exec("UPDATE checkboxes SET checked = false
+                   WHERE day = '#{day.downcase}'
+                   AND user_id = #{student_id.to_i}")
+    end
   end
 
   redirect '/'
