@@ -30,18 +30,19 @@
     crossorigin="anonymous"></script>
   <!-- Custom JS -->
   <script src="/javascripts/disableThenSubmit.js"></script>
+  <script src="/javascripts/removeOnClick.js"></script>
 </head>
 
 <header>
   <% if session[:error] %>
-    <div class="alert alert-warning border text-center" role="alert">
+    <div class="alert alert-warning border text-center" role="alert" onClick="removeOnClick()">
       <p>
         <%= session.delete(:error) %>
       </p>
     </div>
   <% end %>
   <% if session[:success] %>
-    <div class="alert alert-success border text-center" role="alert">
+    <div class="alert alert-success border text-center" role="alert" onClick="removeOnClick()">
       <p>
         <%= session.delete(:success) %>
       </p>
