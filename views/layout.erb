@@ -68,7 +68,7 @@
         <ul class="navbar-nav ml-auto mt-2">
           <li class="nav-item">
             <form action="/users/logout" method="post">
-              <input class="plain-button" type="submit" value="Log Out">
+              <input class="plain-button" type="submit" value="Log Out <%="#{session[:username].capitalize}"%>">
             </form>
           </li>
         </ul>
