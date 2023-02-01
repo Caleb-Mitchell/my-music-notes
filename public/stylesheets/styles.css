@@ -101,6 +101,10 @@ footer a {
   opacity: 1;
 }
 
-div.row {
+div.card-row {
   margin: 30px;
+}
+
+.form-check-input {
+  margin-top: 30px;
 }
