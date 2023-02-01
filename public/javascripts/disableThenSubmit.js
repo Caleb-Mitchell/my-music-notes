@@ -1,5 +1,4 @@
 function disableThenSubmit() {
-  console.log('hello scott')
   const form = document.getElementById('check_boxes')
   if (!form) return
 

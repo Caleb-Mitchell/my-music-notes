@@ -94,5 +94,5 @@ footer a {
 }
 
 [type="checkbox"]:disabled::before {
-  border: 2px solid;
+  border: 2px solid #333;
 }
