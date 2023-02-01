@@ -24,15 +24,15 @@ helpers do
   end
 end
 
-def user_signed_in?
+def user_logged_in?
   session.key?(:username)
 end
 
-def require_signed_in_user
-  return if user_signed_in?
+def require_logged_in_user
+  return if user_logged_in?
 
-  session[:error] = "You must be signed in to do that."
-  redirect '/users/signin'
+  session[:error] = "You must be logged in to do that."
+  redirect '/users/login'
 end
 
 def load_user_credentials
@@ -99,7 +99,7 @@ def username_taken?(name)
   end
 end
 
-def sign_in_user(username)
+def log_in_user(username)
   session[:username] = username
   session[:success] = "User #{username.capitalize} created!"
 end
@@ -122,13 +122,13 @@ def create_new_user(username, password)
   CONN.exec("INSERT INTO users (name, password)
              VALUES ('#{username}', '#{hashed_password}')")
   add_user_checkboxes(username)
-  sign_in_user(username)
+  log_in_user(username)
 end
 
 # Main practice log page
 get '/' do
-  redirect '/users/signin' unless user_signed_in?
-  require_signed_in_user
+  redirect '/users/login' unless user_logged_in?
+  require_logged_in_user
 
   @title = "Practice Log"
   @days = DAYS
@@ -141,7 +141,7 @@ end
 
 # Update page on checkbox toggle
 post '/' do
-  require_signed_in_user
+  require_logged_in_user
 
   @days = DAYS
   student_id = find_student_id(session[:username])
@@ -166,13 +166,13 @@ post '/' do
   redirect '/'
 end
 
-# Allow user to sign in
-get '/users/signin' do
-  @title = "Sign In"
-  erb :signin
+# Allow user to log in
+get '/users/login' do
+  @title = "Log In"
+  erb :login
 end
 
-post '/users/signin' do
+post '/users/login' do
   username = params[:username].downcase
 
   if valid_credentials?(username, params[:password])
@@ -187,20 +187,20 @@ post '/users/signin' do
   else
     session[:error] = "Invalid credentials."
     status 422
-    erb :signin
+    erb :login
   end
 end
 
-# Allow user to sign out
-post '/users/signout' do
+# Allow user to log out
+post '/users/logout' do
   session.delete(:username)
-  session[:success] = "You have been signed out."
-  redirect '/users/signin'
+  session[:success] = "You have been logged out."
+  redirect '/users/login'
 end
 
 # Reset all checkboxes to unchecked
 post '/reset' do
-  require_signed_in_user
+  require_logged_in_user
 
   @days = DAYS
   student_id = find_student_id(session[:username])
@@ -219,6 +219,7 @@ end
 
 # Allow user to register
 get '/users/register' do
+  @title = "Register"
   erb :register
 end
 
