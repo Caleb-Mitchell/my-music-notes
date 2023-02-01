@@ -210,8 +210,8 @@ post '/reset' do
   @days = DAYS
   student_id = find_student_id(session[:username])
 
-  CONN.transaction do |trans_conn|
-    @days.each do |day|
+  @days.each do |day|
+    CONN.transaction do |trans_conn|
       trans_conn.exec("UPDATE checkboxes SET checked = false
                    WHERE day = '#{day.downcase}'
                    AND user_id = #{student_id.to_i}")
