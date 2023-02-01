@@ -1,16 +1,3 @@
-# TODO: provide helpful status codes on errors or redirection
-# TODO: add tests?
-# TODO: Update details on resume
-# TODO: Update README and description for Github
-# TODO: set up apology page?
-# TODO: title instance var for every page GET?
-
-# resume stuff
-# TODO: add more specific time frames for CiP and CS50 to resume
-# TODO: add cip hangman project to resume
-
-# TODO: Add gem versions to GEMFILE
-
 require "bcrypt"
 require "pg"
 require "sinatra"
