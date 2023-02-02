@@ -10,6 +10,7 @@ DAYS_IN_WEEK = DAYS.size
 SECRET = SecureRandom.hex(32)
 
 CONN = PG.connect(dbname: 'musicnotes') if development?
+CONN = PG.connect(dbname: 'musicnotes') if test?
 CONN = PG.connect(ENV.fetch('RAILWAY_DATABASE_URL', nil)) if production?
 
 configure do
@@ -199,6 +200,8 @@ post '/reset' do
                  WHERE day = '#{day.downcase}'
                  AND user_id = #{student_id.to_i}")
   end
+
+  session[:success] = "All days have been unchecked!"
 
   redirect '/'
 end
