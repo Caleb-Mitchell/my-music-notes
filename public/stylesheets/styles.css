@@ -30,17 +30,6 @@ nav .navbar-brand .green {
   color: #2e944b;
 }
 
-.navbar-toggler-icon
-{
-  height: 2.5rem;
-  width: 2.5rem;
-  border-style: none;
-}
-
-button.navbar-toggler {
-  outline: none;
-}
-
 main .form-control {
   /* center form controls */
   display: inline-block;
@@ -62,8 +51,41 @@ main img {
   max-width: 100%;
 }
 
+button.navbar-toggler {
+  outline: none;
+}
+
+}
+
+}
+
+}
+
+}
+
+img.footer-icon {
+  width: 1.2em;
+}
+
+footer a {
+  text-decoration: none;
+}
+
+div.card-row {
+  margin: 30px;
+}
+
+.navbar-toggler-icon
+{
+  border-style: none;
+}
+
 .table-date-text {
   font-size: 28px;
+}
+
+.form-check-input {
+  margin-top: 30px;
 }
 
 .plain-button {
@@ -81,30 +103,12 @@ main img {
   border-style: dotted;
 }
 
-hr.footer-hr {
-  width: 25%;
-}
-
-img.footer-icon {
-  width: 1.2em;
-}
-
-footer a {
-  text-decoration: none;
-}
-
+/* Override the greying out of checkboxes while disabled */
 [type="checkbox"]:disabled::before {
   border: 2px solid #333;
 }
 
+/* Override the greying out of the reset button while disabled */
 #reset-button:disabled {
   opacity: 1;
-}
-
-div.card-row {
-  margin: 30px;
-}
-
-.form-check-input {
-  margin-top: 30px;
 }
