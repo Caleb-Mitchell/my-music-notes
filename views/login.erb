@@ -1,6 +1,6 @@
 <h1>Log In</h1>
 
-<form action='/users/login' method='post' class='form'>
+<form action='/users/login' method='post' class='form login-form'>
   <div class="form-group">
     <input autocomplete="off" autofocus class="form-control" name="username" placeholder="Username" type="text"
       value="<%= params[:username] %>">
@@ -12,4 +12,15 @@
   <div class="responsive-register">
     No Account? <a href="/users/register">Register Here</a>
   </div>
+
+  <hr class="footer-hr">
+
+  <section>
+    <h5>Welcome!</h5>
+    <p class="welcome-info">
+      My Music Notes is a tool for anyone to track which days they have practiced,
+      in between weekly private music lessons. Log in, or register, to see your
+      personalized practice log for the week.
+    </p>
+  </section>
 </form>
