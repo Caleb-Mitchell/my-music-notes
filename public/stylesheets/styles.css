@@ -55,12 +55,23 @@ button.navbar-toggler {
   outline: none;
 }
 
+hr.login-info-hr {
+  margin-top: 4rem;
 }
 
+hr.footer-hr {
+  width: 25%;
+  margin-top: 0;
 }
 
+section.welcome-info h5 {
+  text-decoration-line: underline;
+  margin-bottom: 1rem;
 }
 
+section.welcome-info {
+  padding-top: 2rem;
+  margin-bottom: -1rem;
 }
 
 img.footer-icon {
