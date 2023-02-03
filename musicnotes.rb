@@ -213,6 +213,7 @@ get '/users/register' do
   erb :register
 end
 
+# rubocop:disable Metrics/BlockLength
 post '/users/register' do
   username = params[:username]
 
@@ -228,11 +229,16 @@ post '/users/register' do
     session[:error] = "Please provide a password."
     status 422
     erb :register
+  elsif params[:password] != params[:confirm_password]
+    session[:error] = "Passwords do not match."
+    status 422
+    erb :register
   else
     create_new_user(username, params[:password])
     redirect '/'
   end
 end
+# rubocop:enable Metrics/BlockLength
 
 # Show listening recomendations
 get '/listen' do
