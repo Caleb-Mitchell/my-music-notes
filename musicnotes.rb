@@ -102,10 +102,13 @@ end
 def add_user_checkboxes(username)
   user_id = find_student_id(username)
   days = DAYS
+
+  query = ''
   days.each do |day|
-    CONN.exec("INSERT INTO checkboxes (day, user_id)
-                 VALUES ('#{day.downcase}', #{user_id})")
+    query << "INSERT INTO checkboxes (day, user_id)
+                 VALUES ('#{day.downcase}', #{user_id});"
   end
+  CONN.exec(query)
 end
 
 def create_new_user(username, password)
@@ -139,17 +142,18 @@ post '/' do
   student_id = find_student_id(session[:username])
 
   # update check values in checkboxes database
+  query = ''
   @days.each do |day|
     name = "#{day.downcase}_check"
     checked = (params[name] == 'checked')
-
-    CONN.exec("UPDATE checkboxes SET checked = '#{checked}'
+    query << "UPDATE checkboxes SET checked = '#{checked}'
                  WHERE day = '#{day.downcase}'
-                 AND user_id = #{student_id.to_i}")
+                 AND user_id = #{student_id.to_i};"
+  end
+  CONN.exec(query)
 
-    if practice_every_day?(student_id)
-      session[:success] = "Great job practicing this week!"
-    end
+  if practice_every_day?(student_id)
+    session[:success] = "Great job practicing this week!"
   end
 
   redirect '/'
@@ -195,11 +199,13 @@ post '/reset' do
   @days = DAYS
   student_id = find_student_id(session[:username])
 
+  query = ''
   @days.each do |day|
-    CONN.exec("UPDATE checkboxes SET checked = false
+    query << "UPDATE checkboxes SET checked = false
                  WHERE day = '#{day.downcase}'
-                 AND user_id = #{student_id.to_i}")
+                 AND user_id = #{student_id.to_i};"
   end
+  CONN.exec(query)
 
   session[:success] = "All days have been unchecked!"
 
