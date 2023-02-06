@@ -2,7 +2,7 @@
 
 Production version of the site served at [mymusicnotes.net](https://www.mymusicnotes.net).
 
-The original iteration of this project, [found here](https://github.com/Caleb-Mitchell/my-music-notes-flask), was my final project submitted for the end of course [CS50](https://pll.harvard.edu/course/cs50-introduction-computer-science?delta=0), offered online by Harvard University.
+The original iteration of this project, [my-music-notes-CS50](https://github.com/Caleb-Mitchell/my-music-notes-CS50), was my final project submitted for the end of course [CS50](https://pll.harvard.edu/course/cs50-introduction-computer-science?delta=0), offered online by Harvard University.
 
 This was previously built in Python using Flask and Sqlite, but rebuilt and expanded upon here using more recent knowledge gained through studies at Launch School. This new implementation is written in Ruby, using Sinatra and PostgreSQL. The website is hosted via Heroku, and the database is provisioned by Railway.
 
