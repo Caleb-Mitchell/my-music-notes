@@ -166,9 +166,9 @@ get '/users/login' do
 end
 
 post '/users/login' do
-  username = params[:username].downcase
+  if valid_credentials?(params[:username], params[:password])
+    username = params[:username]
 
-  if valid_credentials?(username, params[:password])
     session[:username] = username
     session[:success] = "Welcome #{username.capitalize}!"
 
@@ -226,15 +226,15 @@ end
 post '/users/register' do
   username = params[:username]
 
-  if username_taken?(username)
-    session[:error] = "Sorry, that username is already taken."
-    status 422
-    erb :register
-  elsif username.empty?
+  if username.nil? || username.squeeze == " "
     session[:error] = "Please provide a username."
     status 422
     erb :register
-  elsif params[:password].empty?
+  elsif username_taken?(username)
+    session[:error] = "Sorry, that username is already taken."
+    status 422
+    erb :register
+  elsif params[:password].nil?
     session[:error] = "Please provide a password."
     status 422
     erb :register

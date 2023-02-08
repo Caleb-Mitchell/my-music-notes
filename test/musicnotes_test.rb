@@ -27,7 +27,8 @@ class MusicnotesTest < Minitest::Test
 
   def teardown
     user_name = 'test'
-    query = "DELETE FROM users WHERE name = '#{user_name}';"
+    register_test_name = 'test_user_new'
+    query = "DELETE FROM users WHERE name = '#{user_name}' OR name = '#{register_test_name}';"
     CONN.exec(query)
   end
 
@@ -146,5 +147,79 @@ class MusicnotesTest < Minitest::Test
   def test_reset_success_flash
     post "/reset", params_all_days_checked, test_session
     assert_includes "All days have been unchecked!", session[:success]
+  end
+
+  def test_user_login_success
+    post '/users/login', { username: 'test', password: 'test' }
+    assert_equal 302, last_response.status
+    assert_includes last_response['Location'], '/'
+    assert_equal "Welcome Test!", session[:success]
+  end
+
+  def test_user_login_failure
+    post '/users/login'
+    assert_equal 422, last_response.status
+    assert_includes last_response.body, 'Invalid credentials'
+  end
+
+  def test_user_logout
+    post '/users/logout'
+    assert_nil session[:username]
+    assert_equal "You have been logged out.", session[:success]
+  end
+
+  def test_register_new_user_failure_no_name
+    post '/users/register'
+    assert_includes last_response.body, 'Please provide a username.'
+    assert_equal 422, last_response.status
+  end
+
+  def test_register_new_user_failure_name_empty_string
+    post '/users/register'
+    assert_includes last_response.body, 'Please provide a username.'
+    assert_equal 422, last_response.status
+  end
+
+  def test_register_new_user_failure_name_taken
+    post '/users/register', { username: 'test' }
+    assert_includes last_response.body, 'Sorry, that username is already taken.'
+    assert_equal 422, last_response.status
+  end
+
+  def test_register_new_user_failure_no_password
+    post '/users/register', { username: 'test_uniq' }
+    assert_includes last_response.body, 'Please provide a password.'
+    assert_equal 422, last_response.status
+  end
+
+  def test_register_new_user_failure_passwords_do_not_match
+    post '/users/register',
+         { username: 'test_uniq', password: 'test',
+           confirm_password: 'not_test' }
+    assert_includes last_response.body, 'Passwords do not match.'
+    assert_equal 422, last_response.status
+  end
+
+  def test_register_new_user_success
+    post '/users/register',
+         { username: 'test_user_new', password: 'test_pass_new',
+           confirm_password: 'test_pass_new' }
+
+    assert_equal 302, last_response.status
+    assert_equal "User Test_user_new created!", session[:success]
+    assert_includes last_response['Location'], '/'
+  end
+
+  def test_show_register_page
+    get '/users/register'
+    assert_equal 200, last_response.status
+    assert_includes last_response.body,
+                    "<form action='/users/register' method='post' class='form'>"
+  end
+
+  def test_show_listen_rec_page
+    get '/listen'
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, "<h1>LISTENING RECS</h1>"
   end
 end
