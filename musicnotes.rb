@@ -9,8 +9,7 @@ DAYS_IN_WEEK = DAYS.size
 
 SECRET = SecureRandom.hex(32)
 
-CONN = PG.connect(dbname: 'musicnotes') if development?
-CONN = PG.connect(dbname: 'musicnotes') if test?
+CONN = PG.connect(dbname: 'musicnotes') if development? || test?
 CONN = PG.connect(ENV.fetch('RAILWAY_DATABASE_URL', nil)) if production?
 
 configure do
@@ -174,13 +173,17 @@ post '/users/login' do
     session[:success] = "Welcome #{username.capitalize}!"
 
     # checkboxes is an array, with each checkbox represented by a hash
-    # with keys "day" and "checked"
+    # example: [{"day"=>"sunday", "checked"=>"t"},
+    #           {"day"=>"monday", "checked"=>"t"},
+    #           {"day"=>"tuesday", "checked"=>"f"},
+    #           {"day"=>"wednesday", "checked"=>"f"} ... ]
     load_user_checkboxes(username)
 
     redirect '/'
   else
     session[:error] = "Invalid credentials."
     status 422
+
     erb :login
   end
 end
