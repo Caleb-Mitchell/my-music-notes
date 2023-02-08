@@ -1,7 +1,5 @@
 ENV["RACK_ENV"] = "test"
 
-require "fileutils"
-
 require "minitest/autorun"
 require "rack/test"
 
