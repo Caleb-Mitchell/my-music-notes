@@ -9,8 +9,11 @@ gem "sinatra-contrib"
 gem "bcrypt"
 gem "securerandom"
 
-gem "minitest"
-gem "rack-test"
+group :test do
+  gem "minitest"
+  gem "rack-test"
+  gem 'simplecov', require: false
+end
 
 group :production do
   gem "pg"
