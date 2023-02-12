@@ -137,6 +137,10 @@ get '/' do
   @title = "Practice Log"
   @days = DAYS
 
+  if admin_session?
+    @users = load_user_credentials.map { |user| user["name"] }
+  end
+
   load_user_checkboxes(session[:username])
   @day_total = session[:checkboxes].count { |day| day["checked"] == "t" }
 
