@@ -66,8 +66,13 @@ class MusicnotesTest < Minitest::Test
     assert_includes last_response.body, "a tool to track"
   end
 
-  def test_index_yes_login
+  def test_index_login_success
     get '/', {}, test_session
+    assert_equal 200, last_response.status
+  end
+
+  def test_index_login_admin_success
+    get '/', {}, admin_session
     assert_equal 200, last_response.status
   end
 
