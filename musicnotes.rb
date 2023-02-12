@@ -230,12 +230,14 @@ post '/reset' do
   redirect '/'
 end
 
+# Request practice log of user from admin login
 post '/users/select' do
   student = params[:student]
 
   redirect "/users/practice/#{student}"
 end
 
+# Display practice log of user from admin login
 get '/users/practice/:student' do
   require_admin_session
 
