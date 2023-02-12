@@ -115,6 +115,8 @@ class MusicnotesTest < Minitest::Test
                   onchange="disableThenSubmit()" checked>'
   end
 
+  # rubocop:disable Metrics/AbcSize
+  # rubocop: disable Metrics/MethodLength
   def test_all_checkboxes_checked
     post '/', params_all_days_checked, test_session
     get '/', {}, test_session
@@ -132,11 +134,6 @@ class MusicnotesTest < Minitest::Test
                   onchange="disableThenSubmit()" checked>'
     assert_includes last_response.body, 'id="saturday_check"
                   onchange="disableThenSubmit()" checked>'
-  end
-
-  def test_great_job_flash
-    post '/', params_all_days_checked, test_session
-    assert_equal "Great job practicing this week!", session[:success]
   end
 
   def test_reset
@@ -158,6 +155,13 @@ class MusicnotesTest < Minitest::Test
                   onchange="disableThenSubmit()">'
     assert_includes last_response.body, 'id="saturday_check"
                   onchange="disableThenSubmit()">'
+  end
+  # rubocop:enable Metrics/AbcSize
+  # rubocop: enable Metrics/MethodLength
+
+  def test_great_job_flash
+    post '/', params_all_days_checked, test_session
+    assert_equal "Great job practicing this week!", session[:success]
   end
 
   def test_reset_success_flash
@@ -237,5 +241,30 @@ class MusicnotesTest < Minitest::Test
     get '/listen'
     assert_equal 200, last_response.status
     assert_includes last_response.body, "<h1>LISTENING RECS</h1>"
+  end
+
+  def test_admin_choose_student_practice
+    post '/users/select', { student: "test" }, admin_session
+
+    assert_equal 302, last_response.status
+    assert_includes last_response['Location'], '/users/practice/test'
+  end
+
+  def test_admin_display_student_practice_success
+    get '/users/practice/test', {}, admin_session
+
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, "<title>My Music Notes: Test " \
+                                        "Practice Log</title>"
+    assert_includes last_response.body, "<h1>Test's Practice Log</h1>"
+    assert_includes last_response.body, " disabled selected>Test</option>"
+  end
+
+  def test_admin_display_student_practice_failure
+    get '/users/practice/test', {}
+
+    assert_equal 302, last_response.status
+    assert_equal "You do not have permission to view this page.",
+                 session[:error]
   end
 end
