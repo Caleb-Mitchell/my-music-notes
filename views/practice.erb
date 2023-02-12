@@ -1,6 +1,23 @@
-<h1>Practice Log</h1>
+<h1>My Practice Log</h1>
 
-<div class="content">
+<% if admin_session? %>
+  <div class="select-user">
+    <form action="/users/select" method="post">
+      <label>
+        Registered Students:
+        <select name="student" onChange="this.form.submit()">
+          <option value="" disabled selected>Student Name</option>
+          <% @users.reject { |user| user == "admin" }.each do |user| %>
+            <option value="<%= "#{user}" %>"><%= user.capitalize %></option>
+          <% end %>
+        </select>
+      </label>
+    </form>
+  </div>
+<% end %>
+
+<% unless admin_session? %>
+  <div class="content">
     <div class="row card-row">
       <div class="card card-stats mx-auto">
 
@@ -49,3 +66,4 @@
 <form action="/reset" method="post">
     <button class="btn btn-primary" type="submit" id="reset-button" onclick="disableNoSubmit()">Reset All</button>
 </form>
+<% end %>
