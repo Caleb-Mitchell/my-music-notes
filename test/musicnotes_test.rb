@@ -16,19 +16,25 @@ class MusicnotesTest < Minitest::Test
   end
 
   def setup
-    user_name = 'test'
-    password = BCrypt::Password.create('test')
-    query = "DELETE FROM users WHERE name = '#{user_name}';" \
-            "INSERT INTO users (name, password) VALUES " \
-            "('#{user_name}', '#{password}');"
+    users = { 'test' => BCrypt::Password.create('test'),
+              'admin' => BCrypt::Password.create('admin') }
+
+    query = ''
+    users.each do |name, pass|
+      query << "DELETE FROM users WHERE name = '#{name}';"
+      query << "INSERT INTO users (name, password) VALUES " \
+               "('#{name}', '#{pass}');"
+    end
     CONN.exec(query)
-    add_user_checkboxes(user_name)
+    users.each_key { |user| add_user_checkboxes(user) }
   end
 
   def teardown
-    user_name = 'test'
-    register_test_name = 'test_user_new'
-    query = "DELETE FROM users WHERE name = '#{user_name}' OR name = '#{register_test_name}';"
+    users = ['test', 'test_user_new', 'admin']
+    query = ''
+    users.each do |user|
+      query << "DELETE FROM users WHERE name = '#{user}';"
+    end
     CONN.exec(query)
   end
 
