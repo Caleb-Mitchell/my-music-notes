@@ -229,6 +229,26 @@ post '/reset' do
   redirect '/'
 end
 
+post '/users/select' do
+  student = params[:student]
+
+  redirect "/users/practice/#{student}"
+end
+
+get '/users/practice/:student' do
+  require_admin_session
+
+  @student = params[:student]
+  @title = "#{@student.capitalize} Practice Log"
+  @users = load_user_credentials.map { |user| user["name"] }
+  @days = DAYS
+
+  load_user_checkboxes(@student)
+  @day_total = session[:checkboxes].count { |day| day["checked"] == "t" }
+
+  erb :admin_practice
+end
+
 # Allow user to register
 get '/users/register' do
   @title = "Register"
