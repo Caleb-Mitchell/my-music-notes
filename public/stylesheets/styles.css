@@ -86,6 +86,11 @@ div.card-row {
   margin: 30px;
 }
 
+div.select-user {
+  margin-top: 2rem;
+
+}
+
 .navbar-toggler-icon
 {
   border-style: none;
