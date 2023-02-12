@@ -43,6 +43,11 @@ class MusicnotesTest < Minitest::Test
                           password: 'test' } }
   end
 
+  def admin_session
+    { 'rack.session' => { username: 'admin',
+                          password: 'admin' } }
+  end
+
   def session
     last_request.env["rack.session"]
   end
