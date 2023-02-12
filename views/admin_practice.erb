@@ -1,0 +1,54 @@
+<h1><%= "#{@student.capitalize}" %>'s Practice Log</h1>
+
+<div class="content">
+  <form action="/users/select" method="post">
+    <label>
+      Registered Students
+        <select name="student" onChange="this.form.submit()">
+          <option value="" disabled selected><%= @student.capitalize %></option>
+          <% @users.reject { |user| user == @student || user == "admin" }.each do |user| %>
+            <option value="<%= "#{user}" %>"><%= user.capitalize %></option>
+          <% end %>
+        </select>
+    </label>
+  </form>
+  <div class="row card-row">
+    <div class="card card-stats mx-auto">
+
+      <div class="card-header card-header-warning card-header-icon">
+        <p class="card-category">Days Praticed This Week</p>
+        <h3 class="card-title" id="day_total"><%= @day_total %>/<%= DAYS_IN_WEEK %><small>days</small></h3>
+      </div>
+
+    <div class="card-footer">
+      <div class="stats"><h6>Try to practice a little bit every day!</h6></div>
+    </div>
+
+  </div>
+</div>
+
+<form action="/" method="post" id="check_boxes">
+  <table class="table table-bordered">
+      <% @days.each do |day| %>
+      <tr>
+        <td class="table-date-text"><%= day %></td>
+        <td>
+          <div class="form-check">
+            <label class="form-check-label">
+              <% if day_checked?(session[:checkboxes], day) %>
+                <input class="form-check-input" type="checkbox"
+                  value="checked" disabled checked>
+              <% else %>
+                <input class="form-check-input" type="checkbox"
+                  value="checked" disabled>
+              <% end %>
+              <span class="form-check-sign">
+                <span class="check"></span>
+              </span>
+            </label>
+          </div>
+        </td>
+      </tr>
+      <% end %>
+  </table>
+</form>
