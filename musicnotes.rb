@@ -132,7 +132,6 @@ end
 
 # Main practice log page
 get '/' do
-  redirect '/users/login' unless user_logged_in?
   require_logged_in_user
 
   @title = "Practice Log"
