@@ -22,6 +22,10 @@ helpers do
   def day_checked?(checkboxes, day)
     checkboxes.find { |hash| hash["day"] == day.downcase }["checked"] == "t"
   end
+
+  def admin_session?
+    session[:username] == "admin"
+  end
 end
 
 def user_logged_in?
@@ -32,6 +36,13 @@ def require_logged_in_user
   return if user_logged_in?
 
   session[:error] = "You must be logged in to do that."
+  redirect '/users/login'
+end
+
+def require_admin_session
+  return if admin_session?
+
+  session[:error] = "You do not have permission to view this page."
   redirect '/users/login'
 end
 
