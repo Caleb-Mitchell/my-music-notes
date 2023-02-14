@@ -173,13 +173,14 @@ post '/' do
   redirect '/'
 end
 
-# Allow user to log in
+# Ask user to log in or register
 get '/users/login' do
   @title = "Log In"
 
   erb :login
 end
 
+# Allow user to log in
 post '/users/login' do
   if valid_credentials?(params[:username], params[:password])
     username = params[:username]
@@ -252,13 +253,14 @@ get '/users/practice/:student' do
   erb :admin_practice
 end
 
-# Allow user to register
+# Ask user to register
 get '/users/register' do
   @title = "Register"
 
   erb :register
 end
 
+# Allow user to register
 # rubocop:disable Metrics/BlockLength
 post '/users/register' do
   username = params[:username]
