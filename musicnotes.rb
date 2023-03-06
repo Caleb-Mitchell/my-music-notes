@@ -1,11 +1,11 @@
 require "bcrypt"
-require "pg"
 require "sinatra"
-require "sinatra/reloader" if development?
 require "tilt/erubis"
 
+require_relative "database_persistence"
+
 DAYS = %w(Sunday Monday Tuesday Wednesday Thursday Friday Saturday)
-DAYS_IN_WEEK = DAYS.size
+DAYS_COUNT = DAYS.size
 
 SECRET = SecureRandom.hex(32)
 
@@ -16,6 +16,11 @@ configure do
   enable :sessions
   set :session_secret, SECRET
   set :erb, escape_html: true
+end
+
+configure(:development) do
+  require "sinatra/reloader" if development?
+  also_reload "database_persistence.rb"
 end
 
 helpers do
@@ -94,7 +99,7 @@ def practice_every_day?(student_id)
   CONN.exec(query) do |result|
     result.each { |row| count = row["count"] }
   end
-  count.to_i == DAYS_IN_WEEK
+  count.to_i == DAYS_COUNT
 end
 
 def username_taken?(name)
