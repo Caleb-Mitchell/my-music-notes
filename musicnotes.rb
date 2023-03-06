@@ -4,13 +4,10 @@ require "tilt/erubis"
 
 require_relative "database_persistence"
 
-DAYS = %w(Sunday Monday Tuesday Wednesday Thursday Friday Saturday)
-DAYS_COUNT = DAYS.size
-
 SECRET = SecureRandom.hex(32)
 
-CONN = PG.connect(dbname: 'musicnotes') if development? || test?
-CONN = PG.connect(ENV.fetch('RAILWAY_DATABASE_URL', nil)) if production?
+DAYS = %w(Sunday Monday Tuesday Wednesday Thursday Friday Saturday)
+DAYS_COUNT = DAYS.size
 
 configure do
   enable :sessions

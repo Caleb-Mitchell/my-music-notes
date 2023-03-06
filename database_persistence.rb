@@ -3,9 +3,9 @@ require "pg"
 class DatabasePersistence
   def initialize(logger)
     @db = if Sinatra::Base.production?
-            PG.connect(ENV.fetch('DATABASE_URL', nil))
+            PG.connect(ENV.fetch('RAILWAY_DATABASE_URL', nil))
           else
-            PG.connect(dbname: "todos")
+            PG.connect(dbname: 'musicnotes')
           end
     @logger = logger
   end
