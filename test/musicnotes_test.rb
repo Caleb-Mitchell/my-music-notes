@@ -1,4 +1,5 @@
 require 'simplecov'
+require 'logger'
 SimpleCov.start
 
 ENV["RACK_ENV"] = "test"
@@ -7,6 +8,10 @@ require "minitest/autorun"
 require "rack/test"
 
 require_relative "../musicnotes"
+require_relative "../database_persistence"
+
+TEST_USERS = { 'test_user' => BCrypt::Password.create('test_user'),
+               'test_admin' => BCrypt::Password.create('test_admin') }
 
 class MusicnotesTest < Minitest::Test
   include Rack::Test::Methods
@@ -16,44 +21,39 @@ class MusicnotesTest < Minitest::Test
   end
 
   def setup
-    users = { 'test' => BCrypt::Password.create('test'),
-              'admin' => BCrypt::Password.create('admin') }
-
-    query = ''
-    users.each do |name, pass|
-      query << "DELETE FROM users WHERE name = '#{name}';"
-      query << "INSERT INTO users (name, password) VALUES " \
-               "('#{name}', '#{pass}');"
-    end
-    CONN.exec(query)
-    users.each_key { |user| add_user_checkboxes(user) }
+    @storage = DatabasePersistence.new
+    @storage.create_test_users(TEST_USERS)
   end
 
   def teardown
-    users = ['test', 'test_user_new', 'admin']
-    query = ''
-    users.each do |user|
-      query << "DELETE FROM users WHERE name = '#{user}';"
-    end
-    CONN.exec(query)
+    @storage.delete_test_users(TEST_USERS)
   end
 
-  def test_session
-    { 'rack.session' => { username: 'test',
-                          password: 'test' } }
+  def user_session
+    { 'rack.session' => { username: 'test_user',
+                          password: 'test_user' } }
   end
 
   def admin_session
-    { 'rack.session' => { username: 'admin',
-                          password: 'admin' } }
+    { 'rack.session' => { username: 'test_admin',
+                          password: 'test_admin' } }
   end
 
   def session
     last_request.env["rack.session"]
   end
 
-  def params_all_days_checked
-    DAYS.map(&:downcase).to_h { |day| ["#{day}_check".to_sym, "checked"] }
+  def check_two_boxes
+    post '/', { 'checkbox_group' => ['sunday'] }, user_session
+    post '/', { 'checkbox_group' => ['sunday', 'monday'] }, user_session
+  end
+
+  def check_all_boxes
+    day_list = []
+    WEEKDAYS.each do |day|
+      day_list << day.downcase
+      post '/', { 'checkbox_group' => day_list }, user_session
+    end
   end
 
   def test_index_no_login
@@ -67,7 +67,7 @@ class MusicnotesTest < Minitest::Test
   end
 
   def test_index_login_success
-    get '/', {}, test_session
+    get '/', {}, user_session
     assert_equal 200, last_response.status
   end
 
@@ -83,97 +83,73 @@ class MusicnotesTest < Minitest::Test
   end
 
   def test_check_checkbox_yes_login
-    post '/', {}, test_session
+    post '/', { 'checkbox_group' => ['sunday'] }, user_session
     assert_equal 302, last_response.status
     assert_includes last_response['Location'], '/'
   end
 
   def test_no_checkboxes_checked
-    get '/', {}, test_session
+    get '/', {}, user_session
     assert_equal 200, last_response.status
     refute_includes last_response.body,
                     'onchange="disableThenSubmit()" checked>'
   end
 
   def test_one_checkbox_checked
-    post '/', { sunday_check: "checked" }, test_session
-    get '/', {}, test_session
-    assert_includes last_response.body, 'id="sunday_check"
+    post '/', { 'checkbox_group' => ['sunday'] }, user_session
+    get '/', {}, user_session
+    assert_includes last_response.body, 'value="sunday" name="checkbox_group[]"
+                  id="checkbox_group"
                   onchange="disableThenSubmit()" checked>'
-    refute_includes last_response.body, 'id="monday_check"
+    refute_includes last_response.body, 'value="monday" name="checkbox_group[]"
+                  id="checkbox_group"
                   onchange="disableThenSubmit()" checked>'
   end
 
   def test_two_checkboxes_checked
-    post '/', { sunday_check: "checked", monday_check: "checked" }, test_session
-    get '/', {}, test_session
-    assert_includes last_response.body, 'id="sunday_check"
+    check_two_boxes
+    get '/', {}, user_session
+    assert_includes last_response.body, 'value="sunday" name="checkbox_group[]"
+                  id="checkbox_group"
                   onchange="disableThenSubmit()" checked>'
-    assert_includes last_response.body, 'id="monday_check"
-                  onchange="disableThenSubmit()" checked>'
-    refute_includes last_response.body, 'id="tuesday_check"
+    assert_includes last_response.body, 'value="monday" name="checkbox_group[]"
+                  id="checkbox_group"
                   onchange="disableThenSubmit()" checked>'
   end
 
-  # rubocop:disable Metrics/AbcSize
-  # rubocop: disable Metrics/MethodLength
-  def test_all_checkboxes_checked
-    post '/', params_all_days_checked, test_session
-    get '/', {}, test_session
-    assert_includes last_response.body, 'id="sunday_check"
-                  onchange="disableThenSubmit()" checked>'
-    assert_includes last_response.body, 'id="monday_check"
-                  onchange="disableThenSubmit()" checked>'
-    assert_includes last_response.body, 'id="tuesday_check"
-                  onchange="disableThenSubmit()" checked>'
-    assert_includes last_response.body, 'id="wednesday_check"
-                  onchange="disableThenSubmit()" checked>'
-    assert_includes last_response.body, 'id="thursday_check"
-                  onchange="disableThenSubmit()" checked>'
-    assert_includes last_response.body, 'id="friday_check"
-                  onchange="disableThenSubmit()" checked>'
-    assert_includes last_response.body, 'id="saturday_check"
-                  onchange="disableThenSubmit()" checked>'
+  def test_final_checkbox_unchecked
+    post '/', { 'checkbox_group' => ['sunday'] }, user_session
+    post '/', { 'checkbox_group' => nil }, user_session
+    get '/', {}, user_session
   end
 
   def test_reset
-    post "/reset", params_all_days_checked, test_session
+    check_two_boxes
+    post "/reset", {}, user_session
     assert_equal 302, last_response.status
     assert_includes last_response['Location'], '/'
-    get '/', {}, test_session
-    assert_includes last_response.body, 'id="sunday_check"
-                  onchange="disableThenSubmit()">'
-    assert_includes last_response.body, 'id="monday_check"
-                  onchange="disableThenSubmit()">'
-    assert_includes last_response.body, 'id="tuesday_check"
-                  onchange="disableThenSubmit()">'
-    assert_includes last_response.body, 'id="wednesday_check"
-                  onchange="disableThenSubmit()">'
-    assert_includes last_response.body, 'id="thursday_check"
-                  onchange="disableThenSubmit()">'
-    assert_includes last_response.body, 'id="friday_check"
-                  onchange="disableThenSubmit()">'
-    assert_includes last_response.body, 'id="saturday_check"
-                  onchange="disableThenSubmit()">'
+    get '/', {}, user_session
+    refute_includes last_response.body,
+                    'onchange="disableThenSubmit()" checked>'
   end
-  # rubocop:enable Metrics/AbcSize
-  # rubocop: enable Metrics/MethodLength
 
   def test_great_job_flash
-    post '/', params_all_days_checked, test_session
+    check_all_boxes
     assert_equal "Great job practicing this week!", session[:success]
   end
 
   def test_reset_success_flash
-    post "/reset", params_all_days_checked, test_session
+    post '/', { 'checkbox_group' => ['sunday'] }, user_session
+    post '/', { 'checkbox_group' => ['sunday', 'monday'] }, user_session
+    post "/reset", {}, user_session
     assert_includes "All days have been unchecked!", session[:success]
   end
 
   def test_user_login_success
-    post '/users/login', { username: 'test', password: 'test' }
+    post '/users/login', { username: 'test_user', password: 'test_user' }
     assert_equal 302, last_response.status
     assert_includes last_response['Location'], '/'
-    assert_equal "Welcome Test!", session[:success]
+    assert_equal "Welcome Test_user!", session[:success]
   end
 
   def test_user_login_failure
@@ -201,7 +177,7 @@ class MusicnotesTest < Minitest::Test
   end
 
   def test_register_new_user_failure_name_taken
-    post '/users/register', { username: 'test' }
+    post '/users/register', { username: 'test_user' }
     assert_includes last_response.body, 'Sorry, that username is already taken.'
     assert_equal 422, last_response.status
   end
@@ -222,12 +198,14 @@ class MusicnotesTest < Minitest::Test
 
   def test_register_new_user_success
     post '/users/register',
-         { username: 'test_user_new', password: 'test_pass_new',
-           confirm_password: 'test_pass_new' }
-
+         { username: 'additional_user', password: 'additional_user',
+           confirm_password: 'additional_user' }
     assert_equal 302, last_response.status
-    assert_equal "User Test_user_new created!", session[:success]
+    assert_equal "User Additional_user created!", session[:success]
+
+    get '/', { username: 'additional_user' }
     assert_includes last_response['Location'], '/'
+    @storage.delete_user('additional_user')
   end
 
   def test_show_register_page
@@ -251,13 +229,13 @@ class MusicnotesTest < Minitest::Test
   end
 
   def test_admin_display_student_practice_success
-    get '/users/practice/test', {}, admin_session
+    get '/users/practice/test_user', {}, admin_session
 
     assert_equal 200, last_response.status
-    assert_includes last_response.body, "<title>My Music Notes: Test " \
+    assert_includes last_response.body, "<title>My Music Notes: Test_user " \
                                         "Practice Log</title>"
-    assert_includes last_response.body, "<h1>Test's Practice Log</h1>"
-    assert_includes last_response.body, " disabled selected>Test</option>"
+    assert_includes last_response.body, "<h1>Test_user's Practice Log</h1>"
+    assert_includes last_response.body, " disabled selected>Test_user</option>"
   end
 
   def test_admin_display_student_practice_failure
