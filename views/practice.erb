@@ -43,13 +43,13 @@
             <label class="form-check-label">
               <% if day_checked?(session[:checkboxes], day) %>
                 <input class="form-check-input" type="checkbox"
-                  value="checked" name="<%= "#{day.downcase}_check" %>"
-                  id="<%= "#{day.downcase}_check" %>"
+                value="<%= "#{day.downcase}" %>" name="checkbox_group[]"
+                  id="checkbox_group"
                   onchange="disableThenSubmit()" checked>
               <% else %>
                 <input class="form-check-input" type="checkbox"
-                  value="checked" name="<%= "#{day.downcase}_check" %>"
-                  id="<%= "#{day.downcase}_check" %>"
+                value="<%= "#{day.downcase}" %>" name="checkbox_group[]"
+                  id="checkbox_group"
                   onchange="disableThenSubmit()">
               <% end %>
               <span class="form-check-sign">
