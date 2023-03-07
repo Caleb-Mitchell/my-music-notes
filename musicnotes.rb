@@ -161,7 +161,7 @@ get '/users/practice/:student' do
   @title = "#{@student.capitalize} Practice Log"
   @users = @storage.find_all_user_names.map { |user| user["name"] }
   session[:checkboxes] = @storage.load_user_checkboxes(@student)
-  @day_total = session[:checkboxes].count { |day| day["checked"] == "t" }
+  @day_total = session[:checkboxes].count { |day| day[:checked] == true }
 
   erb :admin_practice
 end
