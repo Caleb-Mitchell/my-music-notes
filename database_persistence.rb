@@ -41,36 +41,47 @@ class DatabasePersistence
     create_user_checkboxes(name)
   end
 
-  # rubocop:disable Metrics/MethodLength
-  def create_test_users(test_user_hash)
+  def insert_query_values_and_params(user_hash)
     sql_values = []
     sql_params = []
 
     placeholder = 1
-    test_user_hash.each do |user, pass|
+    user_hash.each do |user, pass|
       sql_values << "($#{placeholder}, $#{placeholder + 1})"
       sql_params << user
       sql_params << pass
       placeholder += 2
     end
 
+    return sql_values, sql_params
+  end
+
+  def delete_query_values_and_params(user_list)
+    sql_values = []
+    sql_params = []
+
+    placeholder = 1
+    user_list.each do |name|
+      sql_values << "name = $#{placeholder}"
+      sql_params << name
+      placeholder += 1
+    end
+
+    return sql_values, sql_params
+  end
+
+  def create_test_users(test_user_hash)
+    sql_values, sql_params = insert_query_values_and_params(test_user_hash)
+
     sql = "INSERT INTO users (name, password) VALUES " << sql_values.join(', ')
     query(sql, *sql_params)
 
     test_user_hash.keys.each { |name| create_user_checkboxes(name) }
   end
-  # rubocop:enable Metrics/MethodLength
 
   def delete_test_users(test_user_hash)
-    sql_values = []
-    sql_params = []
-
-    placeholder = 1
-    test_user_hash.keys.each do |name|
-      sql_values << "name = $#{placeholder}"
-      sql_params << name
-      placeholder += 1
-    end
+    user_name_list = test_user_hash.keys
+    sql_values, sql_params = delete_query_values_and_params(user_name_list)
 
     sql = "DELETE FROM users WHERE " << sql_values.join(' OR ')
     query(sql, *sql_params)
