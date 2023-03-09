@@ -26,10 +26,18 @@ helpers do
   def admin_session?
     session[:username] == "admin" || session[:username] == "test_admin"
   end
-end
 
-def user_logged_in?
-  session.key?(:username)
+  def select_other_users(users_list, student)
+    users_list.reject { |user| user == student || user == "admin" }
+  end
+
+  def select_all_users_non_admin(users_list)
+    users_list.reject { |user| user == "admin" }
+  end
+
+  def user_logged_in?
+    session.key?(:username)
+  end
 end
 
 def require_logged_in_user

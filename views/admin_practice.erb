@@ -6,7 +6,7 @@
       Registered Students
         <select name="student" onChange="this.form.submit()">
           <option value="" disabled selected><%= @student.capitalize %></option>
-          <% @users.reject { |user| user == @student || user == "admin" }.each do |user| %>
+          <% select_other_users(@users, @student).each do |user| %>
             <option value="<%= "#{user}" %>"><%= user.capitalize %></option>
           <% end %>
         </select>
