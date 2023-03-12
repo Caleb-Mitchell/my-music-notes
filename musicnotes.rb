@@ -80,6 +80,12 @@ before do
   @storage = DatabasePersistence.new(logger)
 end
 
+# Redirect to home page on invalid path
+not_found do
+  redirect '/' if user_logged_in?
+  redirect '/users/login'
+end
+
 # Main practice log page
 get '/' do
   redirect '/users/login' unless user_logged_in?

@@ -245,4 +245,16 @@ class MusicnotesTest < Minitest::Test
     assert_equal "You do not have permission to view this page.",
                  session[:error]
   end
+
+  def test_path_not_found
+    get '/test'
+
+    assert_equal 302, last_response.status
+    assert_includes last_response['Location'], '/users/login'
+
+    get '/test', {}, user_session
+
+    assert_equal 302, last_response.status
+    assert_includes last_response['Location'], '/'
+  end
 end
