@@ -12,7 +12,7 @@ GEM
     pg (1.4.5)
     puma (6.0.2)
       nio4r (~> 2.0)
-    rack (2.2.6.3)
+    rack (2.2.6.4)
     rack-protection (2.2.4)
       rack
     rack-test (2.0.2)
@@ -47,7 +47,7 @@ DEPENDENCIES
   minitest
   pg
   puma
-  rack (>= 2.2.6.3)
+  rack (>= 2.2.6.4)
   rack-test
   securerandom
   simplecov

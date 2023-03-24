@@ -3,7 +3,7 @@ source "https://rubygems.org"
 ruby "3.2.0"
 
 gem "erubis"
-gem "rack", ">= 2.2.6.3"
+gem "rack", ">= 2.2.6.4"
 gem "sinatra", "~>2.2.3"
 gem "sinatra-contrib"
 
