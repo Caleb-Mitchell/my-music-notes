@@ -18,5 +18,5 @@ end
 
 group :production do
   gem "pg"
-  gem "puma"
+  gem "puma", "~>6.3"
 end
