@@ -8,9 +8,9 @@ GEM
     multi_json (1.15.0)
     mustermann (2.0.2)
       ruby2_keywords (~> 0.0.1)
-    nio4r (2.5.9)
+    nio4r (2.7.0)
     pg (1.4.5)
-    puma (6.3.1)
+    puma (6.4.2)
       nio4r (~> 2.0)
     rack (2.2.6.4)
     rack-protection (2.2.4)
@@ -46,7 +46,7 @@ DEPENDENCIES
   erubis
   minitest
   pg
-  puma (~> 6.3)
+  puma (~> 6.4.2)
   rack (>= 2.2.6.4)
   rack-test
   securerandom
